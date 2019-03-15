@@ -1,19 +1,30 @@
-'''
-TO do : generate a boolean expression from given cnf file.
-		apply dpll algo and solve
-'''
-
 import sys
-import json
+from dpll import *
 
-def main(argv=None):
+def main(filename):
+    variables, clauses = -1,-1
+    instance_strs = []
 
-  if argv is None: argv = sys.argv
-  if len(argv) != 2:
-    print "Usage: %s <cnf_file>	" % argv[0]
-    return 1
-  return 0
+    f = open(filename, 'r')
+    # Check the file type, raise exceptions if not .cnf file
+    filename_check_str = (f.name).split(".")
+    if filename_check_str[1] != "cnf": raise Exception("Not a CNF problem file")
 
+    lines  = f.readlines()
+    i = -1
+    for i in range(0, len(lines)):
+        line = lines[i]
+        if line.startswith('c'):
+            continue
+        elif line.startswith('p'): # problem statement
+            x = line.split(" ")
+            if (x[1] != "cnf") : raise Exception("not a cnf problem")
+            variables, clauses = int(x[2]), int(x[3])
+            for j in range(i+1, i+clauses+1):
+                instance_strs.append(lines[j].strip('\n'))
+        break
+
+    solver(instance_strs)
+   
 if __name__ == "__main__":
-  sys.exit(main())
-
+    main(sys.argv[1])
